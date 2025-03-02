@@ -13,28 +13,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
-  id         String    @id @default(uuid()) 
-  email      String    @unique @db.VarChar(255)  
+  id_user    String    @id @default(uuid()) 
   name       String    @db.VarChar(100) 
+  email      String    @unique @db.VarChar(255)  
   password   String    @db.VarChar(255) 
-  role       UserRole  @default(USER) @map("user_role")
-  status     UserStatus @default(ACTIVE) 
-  createdAt  DateTime  @default(now()) 
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at")
-  lastLogin  DateTime? @map("last_login")
+  roles     UserRole[]
+  resetToken     String?   @db.VarChar(255)
+  tokenExpiration DateTime?
 }
 
-// Definición de roles
-enum UserRole {
+model UserRole {
+  id_user_role    String  @id @default(uuid())
+  id_user         String  
+  user_role       Role
+  user            User    @relation(fields: [id_user], references: [id_user])  
+}
+
+model Log {
+  id_log String @id @default(uuid())
+  state String  @db.VarChar(100)
+  date DateTime @default(now())
+  description String @db.VarChar(255)
+}
+
+enum Role {
   ADMIN
-  USER
-}
-
-// Estado de la cuenta
-enum UserStatus {
-  ACTIVE
-  SUSPENDED
-  DELETED
+  MANAGER
+  STUDENT
+  TEACHER
 }
